@@ -52,64 +52,62 @@ Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant) {
     child: Card(
       clipBehavior: Clip.antiAlias,
       elevation: 5,
-      child: Flexible(
-        child: Row(
-          children: [
-            Image.network(
-              restaurant.pictureId,
-              fit: BoxFit.cover,
-              width: 135,
-              height: 100,
-            ),
-            const SizedBox(
-              width: 20,
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    restaurant.name,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20,
+      child: Row(
+        children: [
+          Image.network(
+            restaurant.pictureId,
+            fit: BoxFit.cover,
+            width: 135,
+            height: 100,
+          ),
+          const SizedBox(
+            width: 20,
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  restaurant.name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.location_pin,
+                      size: 16,
                     ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(
-                    height: 8,
-                  ),
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.location_pin,
-                        size: 16,
-                      ),
-                      const SizedBox(
-                        width: 4,
-                      ),
-                      Text(restaurant.city),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 4,
-                  ),
-                  RatingStars(
-                    value: restaurant.rating,
-                    starBuilder: (index, color) => Icon(
-                      Icons.star,
-                      color: color,
+                    const SizedBox(
+                      width: 4,
                     ),
-                    valueLabelMargin: const EdgeInsets.only(
-                      top: 6,
-                      right: 8,
-                    ),
+                    Text(restaurant.city),
+                  ],
+                ),
+                const SizedBox(
+                  height: 4,
+                ),
+                RatingStars(
+                  value: restaurant.rating,
+                  starBuilder: (index, color) => Icon(
+                    Icons.star,
+                    color: color,
                   ),
-                ],
-              ),
+                  valueLabelMargin: const EdgeInsets.only(
+                    top: 6,
+                    right: 8,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     ),
   );

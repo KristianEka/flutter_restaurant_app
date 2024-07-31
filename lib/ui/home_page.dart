@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/ui/restaurant_list_page.dart';
+import 'package:restaurant_app/ui/settings_page.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
@@ -42,6 +43,6 @@ class _HomePageState extends State<HomePage> {
 
   final List<Widget> _listWidget = [
     const RestaurantListPage(),
-    const Placeholder(),
+    const SettingsPage(),
   ];
 }
