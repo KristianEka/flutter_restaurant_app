@@ -56,11 +56,17 @@ Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant) {
       elevation: 5,
       child: Row(
         children: [
-          Image.network(
-            restaurant.pictureId,
-            fit: BoxFit.cover,
-            width: 135,
-            height: 100,
+          Hero(
+            tag: restaurant.id,
+            child: Image.network(
+              restaurant.pictureId,
+              fit: BoxFit.cover,
+              width: 135,
+              height: 100,
+              errorBuilder: (ctx, error, _) => const Center(
+                child: Icon(Icons.error),
+              ),
+            ),
           ),
           const SizedBox(
             width: 20,

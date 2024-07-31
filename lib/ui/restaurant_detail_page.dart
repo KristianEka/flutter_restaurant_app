@@ -53,9 +53,15 @@ class RestaurantDetailPage extends StatelessWidget {
           bool scrolled = constraints.biggest.height <=
               kToolbarHeight + MediaQuery.of(context).padding.top;
           return FlexibleSpaceBar(
-            background: Image.network(
-              restaurant.pictureId,
-              fit: BoxFit.cover,
+            background: Hero(
+              tag: restaurant.id,
+              child: Image.network(
+                restaurant.pictureId,
+                fit: BoxFit.cover,
+                errorBuilder: (ctx, error, _) => const Center(
+                  child: Icon(Icons.error),
+                ),
+              ),
             ),
             title: _buildTitle(context, scrolled),
             titlePadding: const EdgeInsets.only(left: 56, bottom: 16),
@@ -146,7 +152,7 @@ class RestaurantDetailPage extends StatelessWidget {
         _buildMenuGrid(restaurant.menus.foods, 'assets/food_placeholder.webp'),
         const Divider(thickness: 2, height: 50),
         Center(child: _buildDetailSubtitle('Drinks', Colors.indigoAccent)),
-        _buildMenuGrid(restaurant.menus.drinks, 'assets/drink_placeholder.png'),
+        _buildMenuGrid(restaurant.menus.drinks, 'assets/drink_placeholder.webp'),
       ],
     );
   }
