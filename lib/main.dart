@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restaurant_app/common/styles.dart';
 import 'package:restaurant_app/data/model/restaurant.dart';
 import 'package:restaurant_app/ui/home_page.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
@@ -15,7 +16,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Restaurant App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: primaryColor,
+              onPrimary: onPrimaryColor,
+              secondary: secondaryColor,
+            ),
+        appBarTheme: const AppBarTheme(elevation: 0),
         useMaterial3: false,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),

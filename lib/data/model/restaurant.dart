@@ -68,8 +68,8 @@ class Restaurant {
 }
 
 class Menus {
-  List<Drink> foods;
-  List<Drink> drinks;
+  List<Category> foods;
+  List<Category> drinks;
 
   Menus({
     required this.foods,
@@ -81,8 +81,10 @@ class Menus {
   String toRawJson() => json.encode(toJson());
 
   factory Menus.fromJson(Map<String, dynamic> json) => Menus(
-        foods: List<Drink>.from(json["foods"].map((x) => Drink.fromJson(x))),
-        drinks: List<Drink>.from(json["drinks"].map((x) => Drink.fromJson(x))),
+        foods:
+            List<Category>.from(json["foods"].map((x) => Category.fromJson(x))),
+        drinks: List<Category>.from(
+            json["drinks"].map((x) => Category.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -91,18 +93,19 @@ class Menus {
       };
 }
 
-class Drink {
+class Category {
   String name;
 
-  Drink({
+  Category({
     required this.name,
   });
 
-  factory Drink.fromRawJson(String str) => Drink.fromJson(json.decode(str));
+  factory Category.fromRawJson(String str) =>
+      Category.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  factory Drink.fromJson(Map<String, dynamic> json) => Drink(
+  factory Category.fromJson(Map<String, dynamic> json) => Category(
         name: json["name"],
       );
 

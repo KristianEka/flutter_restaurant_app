@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
+import 'package:restaurant_app/common/styles.dart';
 import 'package:restaurant_app/data/model/restaurant.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
 
@@ -49,6 +50,7 @@ Widget _buildRestaurantItem(BuildContext context, Restaurant restaurant) {
         arguments: restaurant,
       );
     },
+    highlightColor: onPrimaryColor,
     child: Card(
       clipBehavior: Clip.antiAlias,
       elevation: 5,
