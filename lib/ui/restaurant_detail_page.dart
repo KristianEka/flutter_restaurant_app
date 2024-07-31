@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
 import 'package:restaurant_app/common/styles.dart';
 import 'package:restaurant_app/data/model/restaurant.dart';
+import 'package:restaurant_app/widgets/expandable_text.dart';
 import 'package:restaurant_app/widgets/item_card_menu.dart';
 
 class RestaurantDetailPage extends StatelessWidget {
@@ -14,32 +15,50 @@ class RestaurantDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (context, isScrolled) {
-          return [
-            _buildSliverAppBar(context),
-          ];
-        },
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildInfoCard(),
-              Padding(
-                padding: const EdgeInsets.all(14.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildDetailSubtitle('Description', primaryColor),
-                    _buildDescription(),
-                    const Divider(thickness: 3),
-                    _buildMenus(),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          NestedScrollView(
+            headerSliverBuilder: (context, isScrolled) {
+              return [
+                _buildSliverAppBar(context),
+              ];
+            },
+            body: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildInfoCard(),
+                  Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildDetailSubtitle('Description', primaryColor),
+                        _buildDescription(),
+                        const Divider(thickness: 3),
+                        _buildMenus(),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+          Positioned(
+            top: MediaQuery.of(context).padding.top + 5,
+            left: 4,
+            child: Container(
+              decoration: const BoxDecoration(
+                color: primaryColor,
+                shape: BoxShape.circle,
+              ),
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -135,10 +154,9 @@ class RestaurantDetailPage extends StatelessWidget {
   Widget _buildDescription() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Text(
-        restaurant.description,
+      child: ExpandableText(
+        text: restaurant.description,
         maxLines: 4,
-        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -152,7 +170,8 @@ class RestaurantDetailPage extends StatelessWidget {
         _buildMenuGrid(restaurant.menus.foods, 'assets/food_placeholder.webp'),
         const Divider(thickness: 2, height: 50),
         Center(child: _buildDetailSubtitle('Drinks', Colors.indigoAccent)),
-        _buildMenuGrid(restaurant.menus.drinks, 'assets/drink_placeholder.webp'),
+        _buildMenuGrid(
+            restaurant.menus.drinks, 'assets/drink_placeholder.webp'),
       ],
     );
   }

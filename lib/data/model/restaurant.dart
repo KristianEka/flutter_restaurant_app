@@ -29,7 +29,7 @@ class Restaurant {
   String pictureId;
   String city;
   double rating;
-  Menus menus;
+  Menu menus;
 
   Restaurant({
     required this.id,
@@ -53,7 +53,7 @@ class Restaurant {
         pictureId: json["pictureId"],
         city: json["city"],
         rating: json["rating"]?.toDouble(),
-        menus: Menus.fromJson(json["menus"]),
+        menus: Menu.fromJson(json["menus"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -67,20 +67,20 @@ class Restaurant {
       };
 }
 
-class Menus {
+class Menu {
   List<Category> foods;
   List<Category> drinks;
 
-  Menus({
+  Menu({
     required this.foods,
     required this.drinks,
   });
 
-  factory Menus.fromRawJson(String str) => Menus.fromJson(json.decode(str));
+  factory Menu.fromRawJson(String str) => Menu.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  factory Menus.fromJson(Map<String, dynamic> json) => Menus(
+  factory Menu.fromJson(Map<String, dynamic> json) => Menu(
         foods:
             List<Category>.from(json["foods"].map((x) => Category.fromJson(x))),
         drinks: List<Category>.from(
