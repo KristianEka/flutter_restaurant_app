@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/provider/restaurant_provider.dart';
+import 'package:restaurant_app/common/navigation.dart';
+import 'package:restaurant_app/provider/restaurant_list_provider.dart';
+import 'package:restaurant_app/provider/result_state.dart';
+import 'package:restaurant_app/ui/restaurant_search_page.dart';
 import 'package:restaurant_app/widgets/restaurant_item.dart';
 
 class RestaurantListPage extends StatelessWidget {
@@ -13,6 +16,12 @@ class RestaurantListPage extends StatelessWidget {
         title: const Text(
           'Restaurant App',
         ),
+        actions: [
+          IconButton(
+            onPressed: () => Navigation.intent(RestaurantSearchPage.routeName),
+            icon: const Icon(Icons.search),
+          ),
+        ],
       ),
       body: _buildList(context),
     );
@@ -20,16 +29,16 @@ class RestaurantListPage extends StatelessWidget {
 }
 
 Widget _buildList(BuildContext context) {
-  return Consumer<RestaurantProvider>(
+  return Consumer<RestaurantListProvider>(
     builder: (context, state, _) {
       if (state.state == ResultState.loading) {
         return const Center(child: CircularProgressIndicator());
       } else if (state.state == ResultState.hasData) {
         return ListView.builder(
           shrinkWrap: true,
-          itemCount: state.restaurantListResult.restaurants.length,
+          itemCount: state.result.restaurants.length,
           itemBuilder: (context, index) {
-            var restaurant = state.restaurantListResult.restaurants[index];
+            var restaurant = state.result.restaurants[index];
             return RestaurantItem(restaurant: restaurant);
           },
         );

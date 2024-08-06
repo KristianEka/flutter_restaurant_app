@@ -1,13 +1,12 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_list.dart';
+import 'package:restaurant_app/provider/result_state.dart';
 
-enum ResultState { loading, noData, hasData, error }
-
-class RestaurantProvider extends ChangeNotifier {
+class RestaurantListProvider extends ChangeNotifier {
   final ApiService apiService;
 
-  RestaurantProvider({required this.apiService}) {
+  RestaurantListProvider({required this.apiService}) {
     _fetchRestaurantList();
   }
 
@@ -17,7 +16,7 @@ class RestaurantProvider extends ChangeNotifier {
 
   String get message => _message;
 
-  RestaurantListResult get restaurantListResult => _restaurantListResult;
+  RestaurantListResult get result => _restaurantListResult;
 
   ResultState get state => _state;
 

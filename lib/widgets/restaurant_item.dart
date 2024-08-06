@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
+import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/common/styles.dart';
-import 'package:restaurant_app/data/model/restaurant_list.dart';
+import 'package:restaurant_app/data/model/restaurant.dart';
 import 'package:restaurant_app/ui/restaurant_detail_page.dart';
 
 class RestaurantItem extends StatelessWidget {
-  final RestaurantListItem restaurant;
+  final Restaurant restaurant;
 
   const RestaurantItem({super.key, required this.restaurant});
 
@@ -13,10 +14,9 @@ class RestaurantItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pushNamed(
-          context,
+        Navigation.intentWithData(
           RestaurantDetailPage.routeName,
-          arguments: restaurant,
+          restaurant.id,
         );
       },
       highlightColor: onPrimaryColor,

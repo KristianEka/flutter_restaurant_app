@@ -1,69 +1,116 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
+import 'package:provider/provider.dart';
+import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/common/styles.dart';
-import 'package:restaurant_app/data/model/restaurant.dart';
+import 'package:restaurant_app/data/api/api_service.dart';
+import 'package:restaurant_app/data/model/restaurant_detail.dart';
+import 'package:restaurant_app/provider/restaurant_detail_provider.dart';
+import 'package:restaurant_app/provider/result_state.dart';
 import 'package:restaurant_app/widgets/expandable_text.dart';
 import 'package:restaurant_app/widgets/item_card_menu.dart';
 
 class RestaurantDetailPage extends StatelessWidget {
   static const routeName = '/restaurant_detail_page';
 
-  final Restaurant restaurant;
+  final String restaurantId;
 
-  const RestaurantDetailPage({super.key, required this.restaurant});
+  const RestaurantDetailPage({super.key, required this.restaurantId});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          NestedScrollView(
-            headerSliverBuilder: (context, isScrolled) {
-              return [
-                _buildSliverAppBar(context),
-              ];
-            },
-            body: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return ChangeNotifierProvider(
+      create: (_) => RestaurantDetailProvider(
+        apiService: ApiService(),
+        restaurantId: restaurantId,
+      ),
+      child: Consumer<RestaurantDetailProvider>(
+        builder: (context, state, _) {
+          if (state.state == ResultState.loading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state.state == ResultState.hasData) {
+            var restaurantDetailData = state.result.restaurant;
+            return Scaffold(
+              body: Stack(
                 children: [
-                  _buildInfoCard(),
-                  Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildDetailSubtitle('Description', primaryColor),
-                        _buildDescription(),
-                        const Divider(thickness: 3),
-                        _buildMenus(),
-                      ],
+                  NestedScrollView(
+                    headerSliverBuilder: (context, isScrolled) {
+                      return [
+                        _buildSliverAppBar(
+                          restaurantDetailData.id,
+                          restaurantDetailData.name,
+                          restaurantDetailData.pictureId,
+                        ),
+                      ];
+                    },
+                    body: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildRestaurantInfoCard(
+                            restaurantDetailData.city,
+                            restaurantDetailData.rating,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(14.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildDetailSubtitle(
+                                    'Description', primaryColor),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ExpandableText(
+                                    text: restaurantDetailData.description,
+                                    maxLines: 4,
+                                  ),
+                                ),
+                                const Divider(thickness: 3),
+                                _buildMenus(restaurantDetailData.menus),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: MediaQuery.of(context).padding.top + 5,
+                    left: 4,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        color: primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        onPressed: () => Navigation.back(),
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 5,
-            left: 4,
-            child: Container(
-              decoration: const BoxDecoration(
-                color: primaryColor,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ),
-          ),
-        ],
+            );
+          } else if (state.state == ResultState.noData) {
+            return Center(
+              child: Text(state.message),
+            );
+          } else if (state.state == ResultState.error) {
+            return Center(
+              child: Text(state.message),
+            );
+          } else {
+            return const Center(
+              child: Text(''),
+            );
+          }
+        },
       ),
     );
   }
 
-  SliverAppBar _buildSliverAppBar(BuildContext context) {
+  SliverAppBar _buildSliverAppBar(
+      String restaurantId, String restaurantName, String pictureId) {
     return SliverAppBar(
       pinned: true,
       expandedHeight: 300,
@@ -73,16 +120,22 @@ class RestaurantDetailPage extends StatelessWidget {
               kToolbarHeight + MediaQuery.of(context).padding.top;
           return FlexibleSpaceBar(
             background: Hero(
-              tag: restaurant.id,
+              tag: restaurantId,
               child: Image.network(
-                restaurant.pictureId,
+                "https://restaurant-api.dicoding.dev/images/large/$pictureId",
                 fit: BoxFit.cover,
                 errorBuilder: (ctx, error, _) => const Center(
                   child: Icon(Icons.error),
                 ),
               ),
             ),
-            title: _buildTitle(context, scrolled),
+            title: Container(
+              color: scrolled ? null : Colors.black26,
+              padding: scrolled
+                  ? null
+                  : const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+              child: Text(restaurantName),
+            ),
             titlePadding: const EdgeInsets.only(left: 56, bottom: 16),
           );
         },
@@ -90,17 +143,7 @@ class RestaurantDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle(BuildContext context, bool scrolled) {
-    return Container(
-      color: scrolled ? null : Colors.black26,
-      padding: scrolled
-          ? null
-          : const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-      child: Text(restaurant.name),
-    );
-  }
-
-  Card _buildInfoCard() {
+  Card _buildRestaurantInfoCard(String location, double rating) {
     return Card(
       elevation: 10,
       shape: const RoundedRectangleBorder(
@@ -115,79 +158,45 @@ class RestaurantDetailPage extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildLocationInfo(),
-            _buildRatingInfo(),
+            Row(
+              children: [
+                const Icon(
+                  Icons.location_pin,
+                  size: 16,
+                  color: onPrimaryColor,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  location,
+                  style: const TextStyle(fontSize: 18, color: onPrimaryColor),
+                ),
+              ],
+            ),
+            RatingStars(
+              value: rating,
+              starBuilder: (index, color) => Icon(
+                Icons.star,
+                color: color,
+              ),
+              valueLabelMargin: const EdgeInsets.only(top: 4, right: 4),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLocationInfo() {
-    return Row(
-      children: [
-        const Icon(
-          Icons.location_pin,
-          size: 16,
-          color: onPrimaryColor,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          restaurant.city,
-          style: const TextStyle(fontSize: 18, color: onPrimaryColor),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildRatingInfo() {
-    return RatingStars(
-      value: restaurant.rating,
-      starBuilder: (index, color) => Icon(
-        Icons.star,
-        color: color,
-      ),
-      valueLabelMargin: const EdgeInsets.only(top: 4, right: 4),
-    );
-  }
-
-  Widget _buildDescription() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ExpandableText(
-        text: restaurant.description,
-        maxLines: 4,
-      ),
-    );
-  }
-
-  Widget _buildMenus() {
+  Widget _buildMenus(Menus menus) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildDetailSubtitle('Menus', primaryColor),
         Center(child: _buildDetailSubtitle('Foods', Colors.red)),
-        _buildMenuGrid(restaurant.menus.foods, 'assets/food_placeholder.webp'),
+        _buildMenuGrid(menus.foods, 'assets/food_placeholder.webp'),
         const Divider(thickness: 2, height: 50),
         Center(child: _buildDetailSubtitle('Drinks', Colors.indigoAccent)),
-        _buildMenuGrid(
-            restaurant.menus.drinks, 'assets/drink_placeholder.webp'),
+        _buildMenuGrid(menus.drinks, 'assets/drink_placeholder.webp'),
       ],
-    );
-  }
-
-  Widget _buildMenuGrid(List<Category> category, String imagePath) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SizedBox(
-        height: 300,
-        child: GridView.count(
-          crossAxisCount: 2,
-          children: category.map((item) {
-            return MenuCard(category: item, imagePath: imagePath);
-          }).toList(),
-        ),
-      ),
     );
   }
 
@@ -206,6 +215,24 @@ class RestaurantDetailPage extends StatelessWidget {
             fontWeight: FontWeight.bold,
             color: onPrimaryColor,
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMenuGrid(List<Category> category, String imagePath) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: SizedBox(
+        height: 300,
+        child: GridView.count(
+          crossAxisCount: 2,
+          children: category.map((item) {
+            return MenuCard(
+              category: item,
+              imagePath: imagePath,
+            );
+          }).toList(),
         ),
       ),
     );
