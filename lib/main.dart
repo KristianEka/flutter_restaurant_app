@@ -38,8 +38,8 @@ class MyApp extends StatelessWidget {
         RestaurantSearchPage.routeName: (context) =>
             const RestaurantSearchPage(),
         RestaurantReviewPage.routeName: (context) => RestaurantReviewPage(
-            customerReview: ModalRoute.of(context)?.settings.arguments
-                as List<CustomerReview>),
+            restaurantDetail:
+                ModalRoute.of(context)?.settings.arguments as RestaurantDetail),
       },
       navigatorKey: navigatorKey,
     );

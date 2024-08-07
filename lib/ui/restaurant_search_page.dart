@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
@@ -5,10 +7,23 @@ import 'package:restaurant_app/provider/restaurant_search_provider.dart';
 import 'package:restaurant_app/provider/result_state.dart';
 import 'package:restaurant_app/widgets/restaurant_item.dart';
 
-class RestaurantSearchPage extends StatelessWidget {
+class RestaurantSearchPage extends StatefulWidget {
   static const routeName = '/search_page';
 
   const RestaurantSearchPage({super.key});
+
+  @override
+  State<RestaurantSearchPage> createState() => _RestaurantSearchPageState();
+}
+
+class _RestaurantSearchPageState extends State<RestaurantSearchPage> {
+  Timer? _debounce;
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,9 +58,7 @@ class RestaurantSearchPage extends StatelessWidget {
                     hintText: 'Write the name of restaurant ...',
                   ),
                   onChanged: (value) {
-                    context
-                        .read<RestaurantSearchProvider>()
-                        .fetchSearchRestaurant(value);
+                    _onSearchChanged(context, value);
                   },
                 ),
               ),
@@ -57,6 +70,13 @@ class RestaurantSearchPage extends StatelessWidget {
         );
       },
     );
+  }
+
+  _onSearchChanged(BuildContext context, String query) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      context.read<RestaurantSearchProvider>().fetchSearchRestaurant(query);
+    });
   }
 }
 

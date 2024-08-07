@@ -38,6 +38,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   provider: ^6.1.2
   http: ^1.2.2
+  chat_bubbles: ^1.6.0
 
 dev_dependencies:
   flutter_test:
