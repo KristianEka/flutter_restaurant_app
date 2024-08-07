@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
@@ -28,7 +30,7 @@ class RestaurantDetailProvider extends ChangeNotifier {
       notifyListeners();
       final restaurantDetail =
           await apiService.getDetailRestaurant(restaurantId);
-      if (restaurantDetail.error == true) {
+      if (restaurantDetail.restaurant.id.isEmpty) {
         _state = ResultState.noData;
         notifyListeners();
         return _message = restaurantDetail.message;
@@ -40,7 +42,11 @@ class RestaurantDetailProvider extends ChangeNotifier {
     } catch (e) {
       _state = ResultState.error;
       notifyListeners();
-      return _message = 'Error --> $e';
+      if (e is SocketException) {
+        return _message = 'No internet connection';
+      } else {
+        return _message = 'Error --> $e';
+      }
     }
   }
 

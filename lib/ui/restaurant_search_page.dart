@@ -8,54 +8,54 @@ import 'package:restaurant_app/widgets/restaurant_item.dart';
 class RestaurantSearchPage extends StatelessWidget {
   static const routeName = '/search_page';
 
-  RestaurantSearchPage({super.key});
-
-  final searchController = TextEditingController();
+  const RestaurantSearchPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => RestaurantSearchProvider(
         apiService: ApiService(),
-        query: searchController.text = "",
+        query: '',
       ),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Search'),
-        ),
-        body: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: searchController,
-                textInputAction: TextInputAction.search,
-                autofocus: true,
-                maxLines: 1,
-                decoration: InputDecoration(
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25.0),
-                    borderSide: const BorderSide(color: Colors.black87),
+      builder: (context, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Search'),
+          ),
+          body: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  textInputAction: TextInputAction.search,
+                  autofocus: true,
+                  maxLines: 1,
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25.0),
+                      borderSide: const BorderSide(color: Colors.black87),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(20.0),
+                      borderSide: const BorderSide(color: Colors.black87),
+                    ),
+                    suffixIcon: const Icon(Icons.search),
+                    hintText: 'Write the name of restaurant ...',
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                    borderSide: const BorderSide(color: Colors.black87),
-                  ),
-                  suffixIcon: const Icon(Icons.search),
-                  hintText: 'Write the name of restaurant ...',
+                  onChanged: (value) {
+                    context
+                        .read<RestaurantSearchProvider>()
+                        .fetchSearchRestaurant(value);
+                  },
                 ),
-                onSubmitted: (value) {
-                  searchController.text = value;
-                },
-                onChanged: (value) {
-                  searchController.text = value;
-                },
               ),
-            ),
-            _buildList(context),
-          ],
-        ),
-      ),
+              Expanded(
+                child: _buildList(context),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -66,15 +66,12 @@ Widget _buildList(BuildContext context) {
       if (state.state == ResultState.loading) {
         return const Center(child: CircularProgressIndicator());
       } else if (state.state == ResultState.hasData) {
-        return Expanded(
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: state.result.restaurants.length,
-            itemBuilder: (context, index) {
-              var restaurant = state.result.restaurants[index];
-              return RestaurantItem(restaurant: restaurant);
-            },
-          ),
+        return ListView.builder(
+          itemCount: state.result.restaurants.length,
+          itemBuilder: (context, index) {
+            var restaurant = state.result.restaurants[index];
+            return RestaurantItem(restaurant: restaurant);
+          },
         );
       } else if (state.state == ResultState.noData) {
         return Center(
@@ -86,7 +83,7 @@ Widget _buildList(BuildContext context) {
         );
       } else {
         return const Center(
-          child: Text(''),
+          child: Text('No results found'),
         );
       }
     },

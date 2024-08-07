@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_search.dart';
@@ -5,10 +7,10 @@ import 'package:restaurant_app/provider/result_state.dart';
 
 class RestaurantSearchProvider extends ChangeNotifier {
   final ApiService apiService;
-  final String query;
+  late String query;
 
   RestaurantSearchProvider({required this.apiService, required this.query}) {
-    _fetchSearchRestaurant(query);
+    fetchSearchRestaurant(query);
   }
 
   late RestaurantSearchResult _restaurantSearchResult;
@@ -21,7 +23,14 @@ class RestaurantSearchProvider extends ChangeNotifier {
 
   ResultState get state => _state;
 
-  Future<dynamic> _fetchSearchRestaurant(String query) async {
+  Future<dynamic> fetchSearchRestaurant(String query) async {
+    if (query.isEmpty) {
+      _state = ResultState.noData;
+      _message = 'Please enter a search term';
+      notifyListeners();
+      return;
+    }
+
     try {
       _state = ResultState.loading;
       notifyListeners();
@@ -39,7 +48,11 @@ class RestaurantSearchProvider extends ChangeNotifier {
     } catch (e) {
       _state = ResultState.error;
       notifyListeners();
-      return _message = 'Error --> $e';
+      if (e is SocketException) {
+        return _message = 'No internet connection';
+      } else {
+        return _message = 'Error --> $e';
+      }
     }
   }
 }
