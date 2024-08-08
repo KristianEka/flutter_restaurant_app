@@ -6,18 +6,73 @@ import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
 import 'package:restaurant_app/data/model/review.dart';
 import 'package:restaurant_app/provider/add_review_provider.dart';
+import 'package:restaurant_app/provider/result_state.dart';
 import 'package:restaurant_app/widgets/restaurant_detail_info_card.dart';
 
-class RestaurantReviewPage extends StatelessWidget {
+class RestaurantReviewPage extends StatefulWidget {
   static const routeName = '/review-page';
 
   final RestaurantDetail restaurantDetail;
 
-  RestaurantReviewPage({super.key, required this.restaurantDetail});
+  const RestaurantReviewPage({super.key, required this.restaurantDetail});
 
+  @override
+  State<RestaurantReviewPage> createState() => _RestaurantReviewPageState();
+}
+
+class _RestaurantReviewPageState extends State<RestaurantReviewPage> {
   final nameController = TextEditingController();
 
   final reviewController = TextEditingController();
+
+  List<CustomerReview> customerReviews = [];
+
+  @override
+  void initState() {
+    super.initState();
+    customerReviews = widget.restaurantDetail.customerReviews;
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    reviewController.dispose();
+    super.dispose();
+  }
+
+  void updateData(BuildContext context) {
+    Consumer<AddReviewProvider>(
+      builder: (context, state, _) {
+        if (state.state == ResultState.loading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state.state == ResultState.hasData) {
+          setState(() {
+            customerReviews = state.result.customerReviews;
+          });
+          return ListView.builder(
+            primary: false,
+            shrinkWrap: true,
+            itemCount: state.result.customerReviews.length,
+            itemBuilder: (context, index) {
+              return _itemReview(state.result.customerReviews[index]);
+            },
+          );
+        } else if (state.state == ResultState.noData) {
+          return Center(
+            child: Text(state.message),
+          );
+        } else if (state.state == ResultState.error) {
+          return Center(
+            child: Text(state.message),
+          );
+        } else {
+          return const Center(
+            child: Text('No results found'),
+          );
+        }
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +81,14 @@ class RestaurantReviewPage extends StatelessWidget {
       builder: (context, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text('Reviews - ${restaurantDetail.name}'),
+            title: Text('Reviews - ${widget.restaurantDetail.name}'),
           ),
           body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 RestaurantDetailInfoCard(
-                  restaurantDetail: restaurantDetail,
+                  restaurantDetail: widget.restaurantDetail,
                 ),
                 const Padding(
                   padding: EdgeInsets.all(8.0),
@@ -46,10 +101,11 @@ class RestaurantReviewPage extends StatelessWidget {
                   ),
                 ),
                 ListView.builder(
+                  primary: false,
                   shrinkWrap: true,
-                  itemCount: restaurantDetail.customerReviews.length,
+                  itemCount: customerReviews.length,
                   itemBuilder: (context, index) {
-                    return _itemReview(restaurantDetail.customerReviews[index]);
+                    return _itemReview(customerReviews[index]);
                   },
                 ),
               ],
@@ -60,7 +116,7 @@ class RestaurantReviewPage extends StatelessWidget {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (context1) {
+                builder: (dialogContext) {
                   return AlertDialog(
                     title: const Text('Add Review'),
                     content: Column(
@@ -85,23 +141,17 @@ class RestaurantReviewPage extends StatelessWidget {
                       TextButton(
                         child: const Text('Submit'),
                         onPressed: () {
-                          context.read<AddReviewProvider>().postReview(
-                                restaurantDetail.id,
+                          context
+                              .read<AddReviewProvider>()
+                              .postReview(
+                                widget.restaurantDetail.id,
                                 nameController.text,
                                 reviewController.text,
-                              );
-                          var newData = context
-                              .read<AddReviewProvider>()
-                              .result
-                              .customerReviews;
-
-                          ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: newData.length,
-                            itemBuilder: (context, index) {
-                              return _itemReview(newData[index]);
-                            },
-                          );
+                              )
+                              .whenComplete(() {
+                            updateData(context);
+                            Navigator.pop(dialogContext);
+                          });
                         },
                       ),
                     ],
