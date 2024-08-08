@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_stars/flutter_rating_stars.dart';
-import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/common/styles.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
-import 'package:restaurant_app/ui/restaurant_review_page.dart';
 
 class RestaurantDetailInfoCard extends StatelessWidget {
   final RestaurantDetail restaurantDetail;
+  final Function() onClick;
 
   const RestaurantDetailInfoCard({
     super.key,
     required this.restaurantDetail,
+    required this.onClick,
   });
 
   @override
@@ -50,6 +50,7 @@ class RestaurantDetailInfoCard extends StatelessWidget {
                   ],
                 ),
                 InkWell(
+                  onTap: onClick,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -72,12 +73,6 @@ class RestaurantDetailInfoCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  onTap: () {
-                    Navigation.intentWithData(
-                      RestaurantReviewPage.routeName,
-                      restaurantDetail,
-                    );
-                  },
                 ),
               ],
             ),

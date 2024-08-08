@@ -6,6 +6,7 @@ import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
 import 'package:restaurant_app/provider/restaurant_detail_provider.dart';
 import 'package:restaurant_app/provider/result_state.dart';
+import 'package:restaurant_app/ui/restaurant_review_page.dart';
 import 'package:restaurant_app/widgets/expandable_text.dart';
 import 'package:restaurant_app/widgets/item_card_menu.dart';
 import 'package:restaurant_app/widgets/restaurant_detail_info_card.dart';
@@ -45,6 +46,19 @@ class RestaurantDetailPage extends StatelessWidget {
                         children: [
                           RestaurantDetailInfoCard(
                             restaurantDetail: restaurantDetail,
+                            onClick: () {
+                              Navigation.intentWithDataAndReturn(
+                                      RestaurantReviewPage.routeName,
+                                      restaurantDetail)
+                                  ?.then((result) {
+                                if (result == true) {
+                                  context
+                                      .read<RestaurantDetailProvider>()
+                                      .fetchRestaurantDetail(
+                                          restaurantDetail.id);
+                                }
+                              });
+                            },
                           ),
                           Padding(
                             padding: const EdgeInsets.all(14.0),

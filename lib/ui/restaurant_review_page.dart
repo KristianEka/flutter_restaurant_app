@@ -1,13 +1,12 @@
 import 'package:chat_bubbles/bubbles/bubble_special_one.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/common/styles.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
 import 'package:restaurant_app/data/model/review.dart';
 import 'package:restaurant_app/provider/add_review_provider.dart';
-import 'package:restaurant_app/provider/result_state.dart';
-import 'package:restaurant_app/widgets/restaurant_detail_info_card.dart';
 
 class RestaurantReviewPage extends StatefulWidget {
   static const routeName = '/review-page';
@@ -40,39 +39,39 @@ class _RestaurantReviewPageState extends State<RestaurantReviewPage> {
     super.dispose();
   }
 
-  void updateData(BuildContext context) {
-    Consumer<AddReviewProvider>(
-      builder: (context, state, _) {
-        if (state.state == ResultState.loading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state.state == ResultState.hasData) {
-          setState(() {
-            customerReviews = state.result.customerReviews;
-          });
-          return ListView.builder(
-            primary: false,
-            shrinkWrap: true,
-            itemCount: state.result.customerReviews.length,
-            itemBuilder: (context, index) {
-              return _itemReview(state.result.customerReviews[index]);
-            },
-          );
-        } else if (state.state == ResultState.noData) {
-          return Center(
-            child: Text(state.message),
-          );
-        } else if (state.state == ResultState.error) {
-          return Center(
-            child: Text(state.message),
-          );
-        } else {
-          return const Center(
-            child: Text('No results found'),
-          );
-        }
-      },
-    );
-  }
+  // void updateData(BuildContext context) {
+  //   Consumer<AddReviewProvider>(
+  //     builder: (context, state, _) {
+  //       if (state.state == ResultState.loading) {
+  //         return const Center(child: CircularProgressIndicator());
+  //       } else if (state.state == ResultState.hasData) {
+  //         setState(() {
+  //           customerReviews = state.result.customerReviews;
+  //         });
+  //         return ListView.builder(
+  //           primary: false,
+  //           shrinkWrap: true,
+  //           itemCount: state.result.customerReviews.length,
+  //           itemBuilder: (context, index) {
+  //             return _itemReview(state.result.customerReviews[index]);
+  //           },
+  //         );
+  //       } else if (state.state == ResultState.noData) {
+  //         return Center(
+  //           child: Text(state.message),
+  //         );
+  //       } else if (state.state == ResultState.error) {
+  //         return Center(
+  //           child: Text(state.message),
+  //         );
+  //       } else {
+  //         return const Center(
+  //           child: Text('No results found'),
+  //         );
+  //       }
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -83,32 +82,15 @@ class _RestaurantReviewPageState extends State<RestaurantReviewPage> {
           appBar: AppBar(
             title: Text('Reviews - ${widget.restaurantDetail.name}'),
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                RestaurantDetailInfoCard(
-                  restaurantDetail: widget.restaurantDetail,
-                ),
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    'Customer Reviews',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                ListView.builder(
-                  primary: false,
-                  shrinkWrap: true,
-                  itemCount: customerReviews.length,
-                  itemBuilder: (context, index) {
-                    return _itemReview(customerReviews[index]);
-                  },
-                ),
-              ],
+          body: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ListView.builder(
+              primary: false,
+              shrinkWrap: true,
+              itemCount: customerReviews.length,
+              itemBuilder: (context, index) {
+                return _itemReview(customerReviews[index]);
+              },
             ),
           ),
           floatingActionButton: FloatingActionButton(
@@ -149,8 +131,8 @@ class _RestaurantReviewPageState extends State<RestaurantReviewPage> {
                                 reviewController.text,
                               )
                               .whenComplete(() {
-                            updateData(context);
-                            Navigator.pop(dialogContext);
+                            Navigation.back();
+                            Navigator.pop(context, true);
                           });
                         },
                       ),
