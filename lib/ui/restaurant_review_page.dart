@@ -39,40 +39,6 @@ class _RestaurantReviewPageState extends State<RestaurantReviewPage> {
     super.dispose();
   }
 
-  // void updateData(BuildContext context) {
-  //   Consumer<AddReviewProvider>(
-  //     builder: (context, state, _) {
-  //       if (state.state == ResultState.loading) {
-  //         return const Center(child: CircularProgressIndicator());
-  //       } else if (state.state == ResultState.hasData) {
-  //         setState(() {
-  //           customerReviews = state.result.customerReviews;
-  //         });
-  //         return ListView.builder(
-  //           primary: false,
-  //           shrinkWrap: true,
-  //           itemCount: state.result.customerReviews.length,
-  //           itemBuilder: (context, index) {
-  //             return _itemReview(state.result.customerReviews[index]);
-  //           },
-  //         );
-  //       } else if (state.state == ResultState.noData) {
-  //         return Center(
-  //           child: Text(state.message),
-  //         );
-  //       } else if (state.state == ResultState.error) {
-  //         return Center(
-  //           child: Text(state.message),
-  //         );
-  //       } else {
-  //         return const Center(
-  //           child: Text('No results found'),
-  //         );
-  //       }
-  //     },
-  //   );
-  // }
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
