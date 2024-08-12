@@ -18,4 +18,8 @@ class Navigation {
   }
 
   static back() => navigatorKey.currentState?.pop();
+
+  static popWithResult(bool result) {
+    navigatorKey.currentState?.pop(result);
+  }
 }

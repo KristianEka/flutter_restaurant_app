@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/provider/restaurant_list_provider.dart';
-import 'package:restaurant_app/provider/result_state.dart';
 import 'package:restaurant_app/ui/restaurant_search_page.dart';
+import 'package:restaurant_app/utils/result_state.dart';
 import 'package:restaurant_app/widgets/restaurant_item.dart';
 
 class RestaurantListPage extends StatelessWidget {

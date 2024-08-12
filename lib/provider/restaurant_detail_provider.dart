@@ -3,19 +3,16 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
-import 'package:restaurant_app/provider/result_state.dart';
+import 'package:restaurant_app/utils/result_state.dart';
 
 class RestaurantDetailProvider extends ChangeNotifier {
   final ApiService apiService;
-  final String restaurantId;
+  late String restaurantId;
 
-  RestaurantDetailProvider(
-      {required this.apiService, required this.restaurantId}) {
-    fetchRestaurantDetail(restaurantId);
-  }
+  RestaurantDetailProvider({required this.apiService});
 
   late RestaurantDetailResult _restaurantDetailResult;
-  late ResultState _state;
+  late ResultState _state = ResultState.loading;
   String _message = '';
 
   String get message => _message;

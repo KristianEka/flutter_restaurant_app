@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_search.dart';
-import 'package:restaurant_app/provider/result_state.dart';
+import 'package:restaurant_app/utils/result_state.dart';
 
 class RestaurantSearchProvider extends ChangeNotifier {
   final ApiService apiService;
-  late String query;
+  late String query = '';
 
-  RestaurantSearchProvider({required this.apiService, required this.query}) {
+  RestaurantSearchProvider({required this.apiService}) {
     fetchSearchRestaurant(query);
   }
 

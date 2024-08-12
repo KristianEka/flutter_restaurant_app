@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/common/styles.dart';
-import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
 import 'package:restaurant_app/data/model/review.dart';
 import 'package:restaurant_app/provider/add_review_provider.dart';
@@ -20,97 +19,86 @@ class RestaurantReviewPage extends StatefulWidget {
 }
 
 class _RestaurantReviewPageState extends State<RestaurantReviewPage> {
-  final nameController = TextEditingController();
+  final _nameController = TextEditingController();
 
-  final reviewController = TextEditingController();
-
-  List<CustomerReview> customerReviews = [];
+  final _reviewController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-    customerReviews = widget.restaurantDetail.customerReviews;
+  Widget build(BuildContext context) {
+    List<CustomerReview> customerReviews =
+        widget.restaurantDetail.customerReviews;
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Reviews - ${widget.restaurantDetail.name}'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView.builder(
+          primary: false,
+          shrinkWrap: true,
+          itemCount: customerReviews.length,
+          itemBuilder: (context, index) {
+            return _itemReview(customerReviews[index]);
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add_comment),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (dialogContext) {
+              return AlertDialog(
+                title: const Text('Add Review'),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Write your name',
+                      ),
+                    ),
+                    const SizedBox(height: 18),
+                    TextField(
+                      controller: _reviewController,
+                      decoration: const InputDecoration(
+                        labelText: 'Write your restaurant review',
+                      ),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    child: const Text('Submit'),
+                    onPressed: () {
+                      context
+                          .read<AddReviewProvider>()
+                          .postReview(
+                            widget.restaurantDetail.id,
+                            _nameController.text,
+                            _reviewController.text,
+                          )
+                          .whenComplete(() {
+                        Navigation.back();
+                        Navigation.popWithResult(true);
+                      });
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      ),
+    );
   }
 
   @override
   void dispose() {
-    nameController.dispose();
-    reviewController.dispose();
+    _nameController.dispose();
+    _reviewController.dispose();
     super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AddReviewProvider(apiService: ApiService()),
-      builder: (context, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: Text('Reviews - ${widget.restaurantDetail.name}'),
-          ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView.builder(
-              primary: false,
-              shrinkWrap: true,
-              itemCount: customerReviews.length,
-              itemBuilder: (context, index) {
-                return _itemReview(customerReviews[index]);
-              },
-            ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            child: const Icon(Icons.add_comment),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (dialogContext) {
-                  return AlertDialog(
-                    title: const Text('Add Review'),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextField(
-                          controller: nameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Write your name',
-                          ),
-                        ),
-                        const SizedBox(height: 18),
-                        TextField(
-                          controller: reviewController,
-                          decoration: const InputDecoration(
-                            labelText: 'Write your restaurant review',
-                          ),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        child: const Text('Submit'),
-                        onPressed: () {
-                          context
-                              .read<AddReviewProvider>()
-                              .postReview(
-                                widget.restaurantDetail.id,
-                                nameController.text,
-                                reviewController.text,
-                              )
-                              .whenComplete(() {
-                            Navigation.back();
-                            Navigator.pop(context, true);
-                          });
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-        );
-      },
-    );
   }
 
   Widget _itemReview(CustomerReview customerReview) {

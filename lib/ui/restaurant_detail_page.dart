@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/common/styles.dart';
-import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
 import 'package:restaurant_app/provider/restaurant_detail_provider.dart';
-import 'package:restaurant_app/provider/result_state.dart';
 import 'package:restaurant_app/ui/restaurant_review_page.dart';
+import 'package:restaurant_app/utils/result_state.dart';
 import 'package:restaurant_app/widgets/expandable_text.dart';
 import 'package:restaurant_app/widgets/item_card_menu.dart';
 import 'package:restaurant_app/widgets/restaurant_detail_info_card.dart';
 
-class RestaurantDetailPage extends StatelessWidget {
+class RestaurantDetailPage extends StatefulWidget {
   static const routeName = '/restaurant_detail_page';
 
   final String restaurantId;
@@ -19,103 +18,116 @@ class RestaurantDetailPage extends StatelessWidget {
   const RestaurantDetailPage({super.key, required this.restaurantId});
 
   @override
+  State<RestaurantDetailPage> createState() => _RestaurantDetailPageState();
+}
+
+class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
+  @override
+  void initState() {
+    super.initState();
+
+    Future.microtask(() async {
+      if (mounted) {
+        await context
+            .read<RestaurantDetailProvider>()
+            .fetchRestaurantDetail(widget.restaurantId);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ChangeNotifierProvider(
-        create: (_) => RestaurantDetailProvider(
-          apiService: ApiService(),
-          restaurantId: restaurantId,
-        ),
-        child: Consumer<RestaurantDetailProvider>(
-          builder: (context, state, _) {
-            if (state.state == ResultState.loading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state.state == ResultState.hasData) {
-              var restaurantDetail = state.result.restaurant;
-              return Stack(
-                children: [
-                  NestedScrollView(
-                    headerSliverBuilder: (context, isScrolled) {
-                      return [
-                        _buildSliverAppBar(restaurantDetail),
-                      ];
-                    },
-                    body: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          RestaurantDetailInfoCard(
-                            restaurantDetail: restaurantDetail,
-                            onClick: () {
-                              Navigation.intentWithDataAndReturn(
-                                      RestaurantReviewPage.routeName,
-                                      restaurantDetail)
-                                  ?.then((result) {
+      body: Consumer<RestaurantDetailProvider>(
+        builder: (context, state, _) {
+          if (state.state == ResultState.loading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state.state == ResultState.hasData) {
+            var restaurantDetail = state.result.restaurant;
+            return Stack(
+              children: [
+                NestedScrollView(
+                  headerSliverBuilder: (context, isScrolled) {
+                    return [
+                      _buildSliverAppBar(restaurantDetail),
+                    ];
+                  },
+                  body: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        RestaurantDetailInfoCard(
+                          restaurantDetail: restaurantDetail,
+                          onClick: () {
+                            Navigation.intentWithDataAndReturn(
+                              RestaurantReviewPage.routeName,
+                              restaurantDetail,
+                            )?.then(
+                              (result) {
                                 if (result == true) {
-                                  context
-                                      .read<RestaurantDetailProvider>()
-                                      .fetchRestaurantDetail(
-                                          restaurantDetail.id);
+                                  state.fetchRestaurantDetail(
+                                    restaurantDetail.id,
+                                  );
                                 }
-                              });
-                            },
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildDetailSubtitle(
-                                  'Description',
-                                  primaryColor,
+                              },
+                            );
+                          },
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildDetailSubtitle(
+                                'Description',
+                                primaryColor,
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: ExpandableText(
+                                  text: restaurantDetail.description,
+                                  maxLines: 4,
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: ExpandableText(
-                                    text: restaurantDetail.description,
-                                    maxLines: 4,
-                                  ),
-                                ),
-                                const Divider(thickness: 3),
-                                _buildMenus(restaurantDetail.menus),
-                              ],
-                            ),
+                              ),
+                              const Divider(thickness: 3),
+                              _buildMenus(restaurantDetail.menus),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                  Positioned(
-                    top: MediaQuery.of(context).padding.top + 5,
-                    left: 4,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                        color: primaryColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_back, color: Colors.white),
-                        onPressed: () => Navigation.back(),
-                      ),
+                ),
+                Positioned(
+                  top: MediaQuery.of(context).padding.top + 5,
+                  left: 4,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: primaryColor,
+                      shape: BoxShape.circle,
+                    ),
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      onPressed: () => Navigation.back(),
                     ),
                   ),
-                ],
-              );
-            } else if (state.state == ResultState.noData) {
-              return Center(
-                child: Text(state.message),
-              );
-            } else if (state.state == ResultState.error) {
-              return Center(
-                child: Text(state.message),
-              );
-            } else {
-              return const Center(
-                child: Text(''),
-              );
-            }
-          },
-        ),
+                ),
+              ],
+            );
+          } else if (state.state == ResultState.noData) {
+            return Center(
+              child: Text(state.message),
+            );
+          } else if (state.state == ResultState.error) {
+            return Center(
+              child: Text(state.message),
+            );
+          } else {
+            return const Center(
+              child: Text(''),
+            );
+          }
+        },
       ),
     );
   }

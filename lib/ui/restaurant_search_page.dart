@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:restaurant_app/data/api/api_service.dart';
 import 'package:restaurant_app/provider/restaurant_search_provider.dart';
-import 'package:restaurant_app/provider/result_state.dart';
+import 'package:restaurant_app/utils/result_state.dart';
 import 'package:restaurant_app/widgets/restaurant_item.dart';
 
 class RestaurantSearchPage extends StatefulWidget {
@@ -20,56 +19,48 @@ class _RestaurantSearchPageState extends State<RestaurantSearchPage> {
   Timer? _debounce;
 
   @override
-  void dispose() {
-    _debounce?.cancel();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Search'),
+      ),
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              textInputAction: TextInputAction.search,
+              autofocus: true,
+              maxLines: 1,
+              decoration: InputDecoration(
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: const BorderSide(color: Colors.black87),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(20.0),
+                  borderSide: const BorderSide(color: Colors.black87),
+                ),
+                suffixIcon: const Icon(Icons.search),
+                hintText: 'Write the name of restaurant ...',
+              ),
+              onChanged: (value) {
+                _onSearchChanged(context, value);
+              },
+            ),
+          ),
+          Expanded(
+            child: _buildList(context),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => RestaurantSearchProvider(
-        apiService: ApiService(),
-        query: '',
-      ),
-      builder: (context, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Search'),
-          ),
-          body: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  textInputAction: TextInputAction.search,
-                  autofocus: true,
-                  maxLines: 1,
-                  decoration: InputDecoration(
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(25.0),
-                      borderSide: const BorderSide(color: Colors.black87),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(20.0),
-                      borderSide: const BorderSide(color: Colors.black87),
-                    ),
-                    suffixIcon: const Icon(Icons.search),
-                    hintText: 'Write the name of restaurant ...',
-                  ),
-                  onChanged: (value) {
-                    _onSearchChanged(context, value);
-                  },
-                ),
-              ),
-              Expanded(
-                child: _buildList(context),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
   _onSearchChanged(BuildContext context, String query) {
