@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/common/styles.dart';
+import 'package:restaurant_app/data/model/restaurant.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
+import 'package:restaurant_app/provider/database_provider.dart';
 import 'package:restaurant_app/provider/restaurant_detail_provider.dart';
 import 'package:restaurant_app/ui/restaurant_review_page.dart';
 import 'package:restaurant_app/utils/result_state.dart';
@@ -13,9 +15,9 @@ import 'package:restaurant_app/widgets/restaurant_detail_info_card.dart';
 class RestaurantDetailPage extends StatefulWidget {
   static const routeName = '/restaurant_detail_page';
 
-  final String restaurantId;
+  final Restaurant restaurant;
 
-  const RestaurantDetailPage({super.key, required this.restaurantId});
+  const RestaurantDetailPage({super.key, required this.restaurant});
 
   @override
   State<RestaurantDetailPage> createState() => _RestaurantDetailPageState();
@@ -30,7 +32,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
       if (mounted) {
         await context
             .read<RestaurantDetailProvider>()
-            .fetchRestaurantDetail(widget.restaurantId);
+            .fetchRestaurantDetail(widget.restaurant.id);
       }
     });
   }
@@ -112,6 +114,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                     ),
                   ),
                 ),
+                _buildPositionedFavorite(context),
               ],
             );
           } else if (state.state == ResultState.noData) {
@@ -129,6 +132,48 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
           }
         },
       ),
+    );
+  }
+
+  _buildPositionedFavorite(BuildContext context) {
+    return Consumer<DatabaseProvider>(
+      builder: (context, provider, child) {
+        return FutureBuilder<bool>(
+          future: provider.isFavorite(widget.restaurant.id),
+          builder: (context, snapshot) {
+            var isFavorite = snapshot.data ?? false;
+            return Positioned(
+              top: MediaQuery.of(context).padding.top + 5,
+              right: 10,
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: isFavorite
+                    ? IconButton(
+                        onPressed: () {
+                          provider.removeFavorite(widget.restaurant.id);
+                        },
+                        icon: const Icon(
+                          Icons.favorite,
+                          color: onPrimaryColor,
+                        ),
+                      )
+                    : IconButton(
+                        onPressed: () {
+                          provider.addFavorite(widget.restaurant);
+                        },
+                        icon: const Icon(
+                          Icons.favorite_border,
+                          color: onPrimaryColor,
+                        ),
+                      ),
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -169,12 +214,31 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildDetailSubtitle('Menus', primaryColor),
-        Center(child: _buildDetailSubtitle('Foods', Colors.red)),
-        _buildMenuGrid(menus.foods, 'assets/food_placeholder.webp'),
+        _buildDetailSubtitle(
+          'Menus',
+          primaryColor,
+        ),
+        Center(
+          child: _buildDetailSubtitle(
+            'Foods',
+            Colors.red,
+          ),
+        ),
+        _buildMenuGrid(
+          menus.foods,
+          'assets/food_placeholder.webp',
+        ),
         const Divider(thickness: 2, height: 50),
-        Center(child: _buildDetailSubtitle('Drinks', Colors.indigoAccent)),
-        _buildMenuGrid(menus.drinks, 'assets/drink_placeholder.webp'),
+        Center(
+          child: _buildDetailSubtitle(
+            'Drinks',
+            Colors.indigoAccent,
+          ),
+        ),
+        _buildMenuGrid(
+          menus.drinks,
+          'assets/drink_placeholder.webp',
+        ),
       ],
     );
   }

@@ -3,8 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/common/styles.dart';
 import 'package:restaurant_app/data/api/api_service.dart';
+import 'package:restaurant_app/data/db/database_helper.dart';
+import 'package:restaurant_app/data/model/restaurant.dart';
 import 'package:restaurant_app/data/model/restaurant_detail.dart';
 import 'package:restaurant_app/provider/add_review_provider.dart';
+import 'package:restaurant_app/provider/database_provider.dart';
 import 'package:restaurant_app/provider/restaurant_detail_provider.dart';
 import 'package:restaurant_app/provider/restaurant_list_provider.dart';
 import 'package:restaurant_app/provider/restaurant_search_provider.dart';
@@ -44,6 +47,11 @@ class MyApp extends StatelessWidget {
             apiService: ApiService(),
           ),
         ),
+        ChangeNotifierProvider(
+          create: (_) => DatabaseProvider(
+            databaseHelper: DatabaseHelper(),
+          ),
+        ),
       ],
       child: MaterialApp(
         title: 'Restaurant App',
@@ -61,8 +69,8 @@ class MyApp extends StatelessWidget {
         routes: {
           HomePage.routeName: (context) => const HomePage(),
           RestaurantDetailPage.routeName: (context) => RestaurantDetailPage(
-                restaurantId:
-                    ModalRoute.of(context)?.settings.arguments as String,
+                restaurant:
+                    ModalRoute.of(context)?.settings.arguments as Restaurant,
               ),
           RestaurantSearchPage.routeName: (context) =>
               const RestaurantSearchPage(),
