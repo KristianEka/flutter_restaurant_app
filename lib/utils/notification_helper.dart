@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -17,6 +18,7 @@ class NotificationHelper {
 
   factory NotificationHelper() => _instance ?? NotificationHelper._internal();
 
+  @pragma('vm:entry-point')
   Future<void> initNotification(
     FlutterLocalNotificationsPlugin flutterLocalNotificationPlugin,
   ) async {
@@ -73,21 +75,31 @@ class NotificationHelper {
     );
 
     var titleNotification = "<b>Restaurant App</b>";
-    var titleRestaurant = restaurantListResult.restaurants[0].name;
+    var restaurantList = restaurantListResult.restaurants;
+    var randomIndex = Random().nextInt(restaurantList.length);
+    var restaurantTitle = restaurantList[randomIndex].name;
+
+    var payload = json.encode({
+      'restaurants': restaurantListResult.toJson(),
+      'randomIndex': randomIndex,
+    });
 
     await flutterLocalNotificationPlugin.show(
       0,
       titleNotification,
-      titleRestaurant,
+      restaurantTitle,
       platformChannelSpecifics,
-      payload: json.encode(restaurantListResult.toJson()),
+      payload: payload,
     );
   }
 
   void configureSelectNotificationSubject(String route) {
     selectNotificationSubject.stream.listen((String payload) async {
-      var data = RestaurantListResult.fromJson(json.decode(payload));
-      var restaurant = data.restaurants[0];
+      var data = json.decode(payload);
+      var restaurantListResult =
+          RestaurantListResult.fromJson(data['restaurants']);
+      var randomIndex = data['randomIndex'];
+      var restaurant = restaurantListResult.restaurants[randomIndex];
       Navigation.intentWithData(route, restaurant);
     });
   }
