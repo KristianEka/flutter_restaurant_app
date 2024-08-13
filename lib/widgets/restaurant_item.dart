@@ -49,71 +49,72 @@ class RestaurantItem extends StatelessWidget {
                       width: 20,
                     ),
                     Expanded(
-                      flex: 4,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Stack(
+                        alignment: Alignment.centerRight,
                         children: [
-                          Text(
-                            restaurant.name,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Row(
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Icon(
-                                Icons.location_pin,
-                                size: 16,
+                              Text(
+                                restaurant.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(
-                                width: 4,
+                                height: 8,
                               ),
-                              Text(restaurant.city),
+                              Row(
+                                children: [
+                                  const Icon(
+                                    Icons.location_pin,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(
+                                    width: 4,
+                                  ),
+                                  Text(restaurant.city),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 4,
+                              ),
+                              RatingStars(
+                                value: restaurant.rating,
+                                starBuilder: (index, color) => Icon(
+                                  Icons.star,
+                                  color: color,
+                                ),
+                                valueLabelMargin: const EdgeInsets.only(
+                                  top: 6,
+                                  right: 8,
+                                ),
+                              ),
                             ],
                           ),
-                          const SizedBox(
-                            height: 4,
-                          ),
-                          RatingStars(
-                            value: restaurant.rating,
-                            starBuilder: (index, color) => Icon(
-                              Icons.star,
-                              color: color,
-                            ),
-                            valueLabelMargin: const EdgeInsets.only(
-                              top: 6,
-                              right: 8,
-                            ),
-                          ),
+                          isFavorite
+                              ? IconButton(
+                                  onPressed: () {
+                                    provider.removeFavorite(restaurant.id);
+                                  },
+                                  icon: const Icon(
+                                    Icons.favorite,
+                                    color: primaryColor,
+                                  ),
+                                )
+                              : IconButton(
+                                  onPressed: () {
+                                    provider.addFavorite(restaurant);
+                                  },
+                                  icon: const Icon(
+                                    Icons.favorite_border,
+                                    color: primaryColor,
+                                  ),
+                                ),
                         ],
                       ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: isFavorite
-                          ? IconButton(
-                              onPressed: () {
-                                provider.removeFavorite(restaurant.id);
-                              },
-                              icon: const Icon(
-                                Icons.favorite,
-                                color: primaryColor,
-                              ),
-                            )
-                          : IconButton(
-                              onPressed: () {
-                                provider.addFavorite(restaurant);
-                              },
-                              icon: const Icon(
-                                Icons.favorite_border,
-                                color: primaryColor,
-                              ),
-                            ),
                     ),
                   ],
                 ),
