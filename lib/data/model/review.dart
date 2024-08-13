@@ -1,15 +1,3 @@
-// To parse this JSON data, do
-//
-//     final addReviewResult = addReviewResultFromJson(jsonString);
-
-import 'dart:convert';
-
-AddReviewResult addReviewResultFromJson(String str) =>
-    AddReviewResult.fromJson(json.decode(str));
-
-String addReviewResultToJson(AddReviewResult data) =>
-    json.encode(data.toJson());
-
 class AddReviewResult {
   bool error;
   String message;

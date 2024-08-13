@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restaurant_app/provider/preferences_provider.dart';
+import 'package:restaurant_app/provider/scheduling_provider.dart';
+import 'package:restaurant_app/widgets/custom_dialog.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -22,12 +26,20 @@ class SettingsPage extends StatelessWidget {
           children: [
             ListTile(
               title: const Text('Daily Reminder'),
-              trailing: Switch.adaptive(
-                value: provider.isDailyReminderActive,
-                onChanged: (value) {
-                  provider.enableDailyReminder(value);
-                },
-              ),
+              trailing: Consumer<SchedulingProvider>(
+                  builder: (context, scheduled, _) {
+                return Switch.adaptive(
+                  value: provider.isDailyReminderActive,
+                  onChanged: (value) async {
+                    if (Platform.isIOS) {
+                      customDialog(context);
+                    } else {
+                      scheduled.dailyReminder(value);
+                      provider.enableDailyReminder(value);
+                    }
+                  },
+                );
+              }),
             ),
           ],
         );

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_app/ui/favorite_page.dart';
+import 'package:restaurant_app/ui/restaurant_detail_page.dart';
 import 'package:restaurant_app/ui/restaurant_list_page.dart';
 import 'package:restaurant_app/ui/settings_page.dart';
+import 'package:restaurant_app/utils/notification_helper.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = '/home_page';
@@ -13,7 +15,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final NotificationHelper _notificationHelper = NotificationHelper();
+
   int _bottomNavIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationHelper.configureSelectNotificationSubject(
+      RestaurantDetailPage.routeName,
+    );
+  }
+
+  @override
+  void dispose() {
+    selectNotificationSubject.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
