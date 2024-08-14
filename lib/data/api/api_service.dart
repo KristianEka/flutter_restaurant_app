@@ -20,7 +20,8 @@ class ApiService {
   }
 
   Future<RestaurantDetailResult> getDetailRestaurant(
-      String restaurantId) async {
+    String restaurantId,
+  ) async {
     final response =
         await http.get(Uri.parse("${_baseUrl}detail/$restaurantId"));
 
