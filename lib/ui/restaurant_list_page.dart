@@ -35,6 +35,7 @@ Widget _buildList(BuildContext context) {
         return const Center(child: CircularProgressIndicator());
       } else if (state.state == ResultState.hasData) {
         return ListView.builder(
+          primary: false,
           shrinkWrap: true,
           itemCount: state.result.restaurants.length,
           itemBuilder: (context, index) {

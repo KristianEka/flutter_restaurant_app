@@ -22,6 +22,8 @@ class FavoritePage extends StatelessWidget {
       builder: (context, provider, child) {
         if (provider.state == ResultState.hasData) {
           return ListView.builder(
+            primary: false,
+            shrinkWrap: true,
             itemCount: provider.favorites.length,
             itemBuilder: (context, index) {
               return RestaurantItem(restaurant: provider.favorites[index]);

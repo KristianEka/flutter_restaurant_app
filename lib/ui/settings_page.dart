@@ -23,6 +23,8 @@ class SettingsPage extends StatelessWidget {
     return Consumer<PreferencesProvider>(
       builder: (context, provider, child) {
         return ListView(
+          primary: false,
+          shrinkWrap: true,
           children: [
             ListTile(
               title: const Text('Daily Reminder'),

@@ -269,6 +269,8 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
       child: SizedBox(
         height: 300,
         child: GridView.count(
+          primary: false,
+          shrinkWrap: true,
           crossAxisCount: 2,
           children: category.map((item) {
             return MenuCard(
