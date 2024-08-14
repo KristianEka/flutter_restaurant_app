@@ -49,29 +49,42 @@ class RestaurantDetailInfoCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                InkWell(
-                  onTap: onClick,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      RatingStars(
-                        value: restaurantDetail.rating,
-                        starBuilder: (index, color) => Icon(
-                          Icons.star,
-                          color: color,
-                        ),
-                        valueLabelMargin:
-                            const EdgeInsets.only(top: 4, right: 4),
+                Card(
+                  color: primaryColor,
+                  elevation: 5,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(10),
+                    ),
+                  ),
+                  child: InkWell(
+                    onTap: onClick,
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          RatingStars(
+                            value: restaurantDetail.rating,
+                            starBuilder: (index, color) => Icon(
+                              Icons.star,
+                              color: color,
+                            ),
+                            valueLabelMargin:
+                                const EdgeInsets.only(top: 4, right: 4),
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            '${restaurantDetail.customerReviews.length} Reviews',
+                            style: const TextStyle(
+                              color: onPrimaryColor,
+                              fontSize: 11.0,
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 5),
-                      Text(
-                        '${restaurantDetail.customerReviews.length} Reviews',
-                        style: const TextStyle(
-                          color: onPrimaryColor,
-                          fontSize: 11.0,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ],

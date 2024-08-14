@@ -4,6 +4,7 @@ import 'package:restaurant_app/common/navigation.dart';
 import 'package:restaurant_app/provider/restaurant_list_provider.dart';
 import 'package:restaurant_app/ui/restaurant_search_page.dart';
 import 'package:restaurant_app/utils/result_state.dart';
+import 'package:restaurant_app/widgets/custom_refresh.dart';
 import 'package:restaurant_app/widgets/restaurant_item.dart';
 
 class RestaurantListPage extends StatelessWidget {
@@ -44,18 +45,31 @@ Widget _buildList(BuildContext context) {
           },
         );
       } else if (state.state == ResultState.noData) {
-        return Center(
-          child: Text(state.message),
+        return CustomRefresh(
+          message: state.message,
+          onClick: () {
+            _refreshData(context);
+          },
         );
       } else if (state.state == ResultState.error) {
-        return Center(
-          child: Text(state.message),
+        return CustomRefresh(
+          message: state.message,
+          onClick: () {
+            _refreshData(context);
+          },
         );
       } else {
-        return const Center(
-          child: Text(''),
+        return CustomRefresh(
+          message: '',
+          onClick: () {
+            _refreshData(context);
+          },
         );
       }
     },
   );
+}
+
+void _refreshData(BuildContext context) {
+  context.read<RestaurantListProvider>().fetchRestaurantList();
 }

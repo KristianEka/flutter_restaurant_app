@@ -16,7 +16,14 @@ class RestaurantSearchPage extends StatefulWidget {
 }
 
 class _RestaurantSearchPageState extends State<RestaurantSearchPage> {
+  late TextEditingController _queryController;
   Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    _queryController = TextEditingController();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +36,7 @@ class _RestaurantSearchPageState extends State<RestaurantSearchPage> {
           Container(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
+              controller: _queryController,
               textInputAction: TextInputAction.search,
               autofocus: true,
               maxLines: 1,
@@ -59,6 +67,7 @@ class _RestaurantSearchPageState extends State<RestaurantSearchPage> {
 
   @override
   void dispose() {
+    _queryController.dispose();
     _debounce?.cancel();
     super.dispose();
   }

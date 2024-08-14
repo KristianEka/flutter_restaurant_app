@@ -8,6 +8,7 @@ import 'package:restaurant_app/provider/database_provider.dart';
 import 'package:restaurant_app/provider/restaurant_detail_provider.dart';
 import 'package:restaurant_app/ui/restaurant_review_page.dart';
 import 'package:restaurant_app/utils/result_state.dart';
+import 'package:restaurant_app/widgets/custom_refresh.dart';
 import 'package:restaurant_app/widgets/expandable_text.dart';
 import 'package:restaurant_app/widgets/item_card_menu.dart';
 import 'package:restaurant_app/widgets/restaurant_detail_info_card.dart';
@@ -109,7 +110,10 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
                       shape: BoxShape.circle,
                     ),
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Colors.white,
+                      ),
                       onPressed: () => Navigation.back(),
                     ),
                   ),
@@ -118,16 +122,25 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
               ],
             );
           } else if (state.state == ResultState.noData) {
-            return Center(
-              child: Text(state.message),
+            return CustomRefresh(
+              message: state.message,
+              onClick: () {
+                _refreshData();
+              },
             );
           } else if (state.state == ResultState.error) {
-            return Center(
-              child: Text(state.message),
+            return CustomRefresh(
+              message: state.message,
+              onClick: () {
+                _refreshData();
+              },
             );
           } else {
-            return const Center(
-              child: Text(''),
+            return CustomRefresh(
+              message: '',
+              onClick: () {
+                _refreshData();
+              },
             );
           }
         },
@@ -210,7 +223,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
     );
   }
 
-  Widget _buildMenus(Menus menus) {
+  Widget _buildMenus(Menu menu) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -225,7 +238,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
           ),
         ),
         _buildMenuGrid(
-          menus.foods,
+          menu.foods,
           'assets/food_placeholder.webp',
         ),
         const Divider(thickness: 2, height: 50),
@@ -236,7 +249,7 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
           ),
         ),
         _buildMenuGrid(
-          menus.drinks,
+          menu.drinks,
           'assets/drink_placeholder.webp',
         ),
       ],
@@ -281,5 +294,11 @@ class _RestaurantDetailPageState extends State<RestaurantDetailPage> {
         ),
       ),
     );
+  }
+
+  void _refreshData() {
+    context
+        .read<RestaurantDetailProvider>()
+        .fetchRestaurantDetail(widget.restaurant.id);
   }
 }
